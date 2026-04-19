@@ -1,92 +1,69 @@
-# 🌤️ Weather App
+# ⛅ Weather Dashboard
 
-A clean, beginner-friendly weather application built with **React** and **Vite**. Enter any city name to get real-time weather data from the OpenWeatherMap API.
+A polished, production-ready weather dashboard built with React and the Open-Meteo API. Features glassmorphism UI, city autocomplete, and browser geolocation.
 
-![React](https://img.shields.io/badge/React-19-blue)
-![Vite](https://img.shields.io/badge/Vite-8-purple)
-![License](https://img.shields.io/badge/License-MIT-green)
+**[Live Demo →](#)** *(deploy to Vercel/Netlify and update this link)*
 
-## Features
+---
 
-- 🔍 Search weather by city name
-- 🌡️ Displays temperature in Celsius
-- ☁️ Shows weather condition with icon
-- ⏳ Loading state with pulse animation
-- ❌ Descriptive error messages (city not found, network error, bad API key)
-- 💾 Saves last searched city in localStorage
-- 📱 Fully responsive (mobile-friendly)
+## ✨ Features
 
-## Tech Stack
+- 🔍 **City Search** — search any city worldwide with real-time autocomplete
+- 📍 **Geolocation** — one-click weather for your current location
+- 🎨 **Glassmorphism UI** — frosted glass cards with animated gradient background
+- 💾 **Persistence** — remembers your last searched city across sessions
+- ⌨️ **Keyboard Navigation** — full arrow key + Enter support in autocomplete
+- 📱 **Responsive** — works seamlessly on mobile and desktop
+- ♿ **Accessible** — ARIA roles, labels, and semantic HTML
 
-- **React 19** — Functional components + hooks (`useState`, `useEffect`)
-- **Vite 8** — Fast dev server and build tool
-- **Vanilla CSS** — No UI libraries, clean custom styles
-- **OpenWeatherMap API** — Free weather data
+## 🛠 Tech Stack
 
-## Project Structure
+| Layer | Technology |
+|-------|-----------|
+| Framework | React 19 (Vite) |
+| Styling | Vanilla CSS (custom properties) |
+| Weather API | [Open-Meteo](https://open-meteo.com/) (free, no key required) |
+| Geocoding | Open-Meteo Geocoding + Nominatim (reverse) |
+| State | React hooks (`useState`, `useEffect`, `useRef`) |
+
+## 🚀 Getting Started
+
+```bash
+# Clone the repository
+git clone https://github.com/YOUR_USERNAME/weather.git
+cd weather
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+```
+
+The app will be available at `http://localhost:5173`.
+
+## 📁 Project Structure
 
 ```
 src/
 ├── api/
-│   └── weather.js        # API fetch function
+│   └── weather.js        # API layer (fetch, geocode, autocomplete)
 ├── components/
-│   ├── SearchBar.jsx      # City input + search button
+│   ├── SearchBar.jsx      # Search input with autocomplete dropdown
 │   └── WeatherCard.jsx    # Weather data display card
-├── App.jsx                # Root component (state + logic)
-├── index.css              # All styles
-└── main.jsx               # Entry point
+├── App.jsx                # Root component and state management
+├── index.css              # Design system (tokens, layout, components)
+└── main.jsx               # Application entry point
 ```
 
-## Getting Started
+## 🎨 Design Decisions
 
-### Prerequisites
+- **CSS Custom Properties** over utility classes — keeps styles readable and maintainable
+- **Debounced autocomplete** (300ms) — prevents excessive API calls during typing
+- **Shared `performFetch` pattern** — single try/catch flow for all fetch operations
+- **No API key required** — Open-Meteo is free and open, no `.env` setup needed
+- **WMO weather codes** mapped to emoji + descriptions for a clean, icon-free display
 
-- [Node.js](https://nodejs.org/) (v18 or higher)
-- An [OpenWeatherMap API key](https://openweathermap.org/api) (free tier)
+## 📝 License
 
-### Installation
-
-1. **Clone the repo**
-   ```bash
-   git clone <your-repo-url>
-   cd weather
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Add your API key**
-
-   Open `src/api/weather.js` and replace the placeholder:
-   ```js
-   const API_KEY = 'YOUR_API_KEY_HERE'  // <-- paste your key here
-   ```
-
-4. **Start the dev server**
-   ```bash
-   npm run dev
-   ```
-
-5. Open [http://localhost:5173](http://localhost:5173) in your browser.
-
-## How It Works
-
-1. User types a city name in the **SearchBar** and clicks "Search" (or presses Enter)
-2. **App.jsx** calls `fetchWeather(city)` from the API utility
-3. On success, weather data is passed to **WeatherCard** as a prop
-4. On error, a descriptive message is shown
-5. The last successfully searched city is saved to `localStorage` and auto-loaded on next visit
-
-## API Reference
-
-This app uses the [OpenWeatherMap Current Weather API](https://openweathermap.org/current):
-
-```
-GET https://api.openweathermap.org/data/2.5/weather?q={city}&appid={key}&units=metric
-```
-
-## License
-
-This project is open source and available under the [MIT License](LICENSE).
+MIT
