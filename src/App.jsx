@@ -1,7 +1,7 @@
 // App.jsx — Root component of the Weather App
-// Manages weather data state and handles API calls
+// Manages weather data state, handles API calls, and persists last search
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import SearchBar from './components/SearchBar'
 import WeatherCard from './components/WeatherCard'
 import { fetchWeather } from './api/weather'
@@ -29,12 +29,23 @@ function App() {
     try {
       const data = await fetchWeather(city)
       setWeather(data)  // Store the API response
+
+      // Save the successfully searched city to localStorage
+      localStorage.setItem('lastCity', city)
     } catch (err) {
       setError(err.message)  // Store the error message
     } finally {
       setLoading(false)  // Hide loading state regardless of success/failure
     }
   }
+
+  // On first load, check if there's a saved city and auto-search it
+  useEffect(() => {
+    const savedCity = localStorage.getItem('lastCity')
+    if (savedCity) {
+      handleSearch(savedCity)
+    }
+  }, [])  // Empty dependency array = runs only once on mount
 
   return (
     <div className="app">

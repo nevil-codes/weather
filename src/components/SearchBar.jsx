@@ -4,8 +4,10 @@
 import { useState } from 'react'
 
 function SearchBar({ onSearch }) {
-  // State to store the text the user types in the input
-  const [city, setCity] = useState('')
+  // Initialize input with last searched city from localStorage (if any)
+  const [city, setCity] = useState(
+    () => localStorage.getItem('lastCity') || ''
+  )
 
   // Called when the user clicks "Search" or presses Enter
   const handleSearch = () => {
