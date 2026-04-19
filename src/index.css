@@ -1,1 +1,35 @@
-/* Global styles — will be added in later commits */
+/* ===========================
+   Global Styles — Weather App
+   =========================== */
+
+/* Reset default margins and set a base font */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f0f4f8;
+  color: #333;
+  min-height: 100vh;
+}
+
+/* ===========================
+   App Layout — centered column
+   =========================== */
+
+.app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 20px;
+  min-height: 100vh;
+}
+
+.app-title {
+  font-size: 2rem;
+  margin-bottom: 24px;
+  color: #1a1a2e;
+}
