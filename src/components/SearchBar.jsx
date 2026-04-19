@@ -1,20 +1,15 @@
-// SearchBar.jsx — Production search with autocomplete dropdown
-// Debounced city suggestions from the Open-Meteo geocoding API
-
 import { useState, useEffect, useRef } from 'react'
 import { searchCities } from '../api/weather'
 
 function SearchBar({ onSearch }) {
-  const [city, setCity] = useState(
-    () => localStorage.getItem('lastCity') || ''
-  )
+  const [city, setCity] = useState(() => localStorage.getItem('lastCity') || '')
   const [suggestions, setSuggestions] = useState([])
   const [showDropdown, setShowDropdown] = useState(false)
-  const [activeSuggestion, setActiveSuggestion] = useState(-1)
-  const dropdownRef = useRef(null)
+  const [activeIdx, setActiveIdx] = useState(-1)
+  const wrapperRef = useRef(null)
   const debounceRef = useRef(null)
 
-  // Debounced autocomplete — waits 300ms after the user stops typing
+  // debounced autocomplete
   useEffect(() => {
     if (city.trim().length < 2) {
       setSuggestions([])
@@ -22,32 +17,29 @@ function SearchBar({ onSearch }) {
       return
     }
 
-    // Clear any existing timeout
     clearTimeout(debounceRef.current)
-
-    // Set a new timeout to fetch suggestions
     debounceRef.current = setTimeout(async () => {
       const results = await searchCities(city)
       setSuggestions(results)
       setShowDropdown(results.length > 0)
-      setActiveSuggestion(-1)
+      setActiveIdx(-1)
     }, 300)
 
     return () => clearTimeout(debounceRef.current)
   }, [city])
 
-  // Close dropdown when clicking outside
+  // close dropdown on outside click
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+    const handler = (e) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
         setShowDropdown(false)
       }
     }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
   }, [])
 
-  const handleSearch = () => {
+  const submitSearch = () => {
     const trimmed = city.trim()
     if (trimmed) {
       onSearch(trimmed)
@@ -55,36 +47,32 @@ function SearchBar({ onSearch }) {
     }
   }
 
-  const handleSelectSuggestion = (suggestion) => {
-    setCity(suggestion)
+  const pickSuggestion = (s) => {
+    setCity(s)
     setShowDropdown(false)
-    onSearch(suggestion)
+    onSearch(s)
   }
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
-      if (activeSuggestion >= 0 && suggestions[activeSuggestion]) {
-        handleSelectSuggestion(suggestions[activeSuggestion])
+      if (activeIdx >= 0 && suggestions[activeIdx]) {
+        pickSuggestion(suggestions[activeIdx])
       } else {
-        handleSearch()
+        submitSearch()
       }
     } else if (e.key === 'ArrowDown') {
       e.preventDefault()
-      setActiveSuggestion((prev) =>
-        prev < suggestions.length - 1 ? prev + 1 : prev
-      )
+      setActiveIdx((prev) => (prev < suggestions.length - 1 ? prev + 1 : prev))
     } else if (e.key === 'ArrowUp') {
       e.preventDefault()
-      setActiveSuggestion((prev) => (prev > 0 ? prev - 1 : -1))
+      setActiveIdx((prev) => (prev > 0 ? prev - 1 : -1))
     } else if (e.key === 'Escape') {
       setShowDropdown(false)
     }
   }
 
-  const isDisabled = city.trim().length === 0
-
   return (
-    <div className="search-bar" ref={dropdownRef}>
+    <div className="search-bar" ref={wrapperRef}>
       <div className="search-input-wrapper">
         <input
           type="text"
@@ -98,16 +86,15 @@ function SearchBar({ onSearch }) {
           spellCheck="false"
         />
 
-        {/* Autocomplete dropdown */}
         {showDropdown && (
           <ul className="autocomplete-dropdown" role="listbox">
-            {suggestions.map((s, index) => (
+            {suggestions.map((s, i) => (
               <li
                 key={s}
-                className={`autocomplete-item ${index === activeSuggestion ? 'active' : ''}`}
-                onClick={() => handleSelectSuggestion(s)}
+                className={`autocomplete-item ${i === activeIdx ? 'active' : ''}`}
+                onClick={() => pickSuggestion(s)}
                 role="option"
-                aria-selected={index === activeSuggestion}
+                aria-selected={i === activeIdx}
               >
                 📍 {s}
               </li>
@@ -118,9 +105,8 @@ function SearchBar({ onSearch }) {
 
       <button
         className="search-button"
-        onClick={handleSearch}
-        disabled={isDisabled}
-        aria-label="Search weather"
+        onClick={submitSearch}
+        disabled={!city.trim()}
       >
         Search
       </button>

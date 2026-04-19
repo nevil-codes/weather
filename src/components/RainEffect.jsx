@@ -1,58 +1,42 @@
-// RainEffect.jsx — Apple Weather–style precipitation overlay
-// CSS-only animated raindrops, intensity-driven, non-intrusive
-//
-// Usage: <RainEffect intensity="low" /> | <RainEffect intensity="medium" /> | <RainEffect intensity="high" />
-// Or:   <RainEffect probability={75} />
-
 import { useMemo } from 'react'
 
-/**
- * Maps a precipitation probability (0–100) to an intensity level.
- * Returns null if below activation threshold (10%).
- */
-function getIntensityFromProbability(probability) {
-  if (probability < 10) return null
-  if (probability < 30) return 'low'
-  if (probability < 60) return 'medium'
+const INTENSITY_CONFIG = {
+  low: { count: 8, className: 'rain-low' },
+  medium: { count: 16, className: 'rain-medium' },
+  high: { count: 28, className: 'rain-high' },
+}
+
+function intensityFromProbability(prob) {
+  if (prob < 10) return null
+  if (prob < 30) return 'low'
+  if (prob < 60) return 'medium'
   return 'high'
 }
 
-/** Configuration for each intensity level */
-const INTENSITY_CONFIG = {
-  low: { dropCount: 8, className: 'rain-low' },
-  medium: { dropCount: 16, className: 'rain-medium' },
-  high: { dropCount: 28, className: 'rain-high' },
-}
-
 function RainEffect({ intensity, probability }) {
-  // Resolve intensity — prop takes priority, then derive from probability
-  const resolvedIntensity = intensity || getIntensityFromProbability(probability ?? 0)
+  const level = intensity || intensityFromProbability(probability ?? 0)
 
-  // Generate raindrop positions (memoized so they don't shift on re-render)
+  // memoize random positions so they don't jump on re-renders
   const drops = useMemo(() => {
-    if (!resolvedIntensity) return []
-    const config = INTENSITY_CONFIG[resolvedIntensity]
+    if (!level) return []
+    const config = INTENSITY_CONFIG[level]
     if (!config) return []
 
-    return Array.from({ length: config.dropCount }, (_, i) => ({
+    return Array.from({ length: config.count }, (_, i) => ({
       id: i,
       left: `${Math.random() * 100}%`,
       delay: `${(Math.random() * 1.5).toFixed(2)}s`,
       duration: `${(0.4 + Math.random() * 0.4).toFixed(2)}s`,
       opacity: 0.15 + Math.random() * 0.35,
     }))
-  }, [resolvedIntensity])
+  }, [level])
 
-  // Don't render if below threshold
-  if (!resolvedIntensity || drops.length === 0) return null
+  if (!level || drops.length === 0) return null
 
-  const config = INTENSITY_CONFIG[resolvedIntensity]
+  const config = INTENSITY_CONFIG[level]
 
   return (
-    <div
-      className={`rain-overlay ${config.className}`}
-      aria-hidden="true"
-    >
+    <div className={`rain-overlay ${config.className}`} aria-hidden="true">
       {drops.map((drop) => (
         <span
           key={drop.id}
@@ -69,5 +53,4 @@ function RainEffect({ intensity, probability }) {
   )
 }
 
-export { getIntensityFromProbability }
 export default RainEffect

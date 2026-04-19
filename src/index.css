@@ -1,17 +1,6 @@
-/* ===========================
-   Weather Dashboard — Design System
-   ===========================
-   
-   Design tokens and global styles for a production
-   weather dashboard with glassmorphism aesthetics.
-*/
-
-/* ===========================
-   Design Tokens (CSS Custom Properties)
-   =========================== */
+/* Design Tokens */
 
 :root {
-  /* Colors */
   --color-bg-start: #0f0c29;
   --color-bg-mid: #302b63;
   --color-bg-end: #24243e;
@@ -25,7 +14,6 @@
   --color-error: #ff6b6b;
   --color-error-bg: rgba(255, 107, 107, 0.12);
 
-  /* Typography */
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-size-xs: 0.8rem;
   --font-size-sm: 0.9rem;
@@ -35,7 +23,6 @@
   --font-size-2xl: 2rem;
   --font-size-3xl: 4.5rem;
 
-  /* Spacing */
   --space-xs: 4px;
   --space-sm: 8px;
   --space-md: 16px;
@@ -43,29 +30,23 @@
   --space-xl: 32px;
   --space-2xl: 48px;
 
-  /* Radii */
   --radius-sm: 10px;
   --radius-md: 16px;
   --radius-lg: 24px;
   --radius-full: 9999px;
 
-  /* Shadows */
   --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.25);
   --shadow-glow: 0 0 40px rgba(108, 99, 255, 0.15);
 
-  /* Blur */
   --blur-glass: blur(20px);
   --blur-light: blur(8px);
 
-  /* Transitions */
   --transition-fast: 150ms ease;
   --transition-base: 250ms ease;
   --transition-slow: 400ms ease-out;
 }
 
-/* ===========================
-   Reset & Base
-   =========================== */
+/* Reset */
 
 * {
   margin: 0;
@@ -92,9 +73,7 @@ body {
   100% { background-position: 0% 50%; }
 }
 
-/* ===========================
-   App Layout
-   =========================== */
+/* Layout */
 
 .app {
   display: flex;
@@ -105,7 +84,6 @@ body {
   position: relative;
 }
 
-/* Ambient floating orbs for depth */
 .app::before,
 .app::after {
   content: '';
@@ -151,9 +129,7 @@ body {
   z-index: 1;
 }
 
-/* ===========================
-   SearchBar
-   =========================== */
+/* Search */
 
 .search-bar {
   display: flex;
@@ -200,23 +176,11 @@ body {
   transition: background-color var(--transition-fast), transform var(--transition-fast), opacity var(--transition-fast);
 }
 
-.search-button:hover {
-  background-color: #5a52e0;
-}
+.search-button:hover { background-color: #5a52e0; }
+.search-button:active { transform: scale(0.97); }
+.search-button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-.search-button:active {
-  transform: scale(0.97);
-}
-
-.search-button:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* ===========================
-   Search Input Wrapper + Autocomplete
-   =========================== */
+/* Autocomplete */
 
 .search-input-wrapper {
   position: relative;
@@ -240,14 +204,8 @@ body {
 }
 
 @keyframes dropdownEnter {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .autocomplete-item {
@@ -259,18 +217,15 @@ body {
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.autocomplete-item:last-child {
-  border-bottom: none;
-}
+.autocomplete-item:last-child { border-bottom: none; }
 
 .autocomplete-item:hover,
 .autocomplete-item.active {
   background: rgba(108, 99, 255, 0.2);
   color: var(--color-text-primary);
 }
-/* ===========================
-   Geolocation Button
-   =========================== */
+
+/* Geolocation */
 
 .geo-button {
   background: none;
@@ -293,19 +248,10 @@ body {
   color: var(--color-text-primary);
 }
 
-.geo-button:active {
-  transform: scale(0.97);
-}
+.geo-button:active { transform: scale(0.97); }
+.geo-button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-.geo-button:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* ===========================
-   Weather Card — Glassmorphism
-   =========================== */
+/* Weather Card */
 
 .weather-card {
   background: var(--color-glass);
@@ -340,10 +286,7 @@ body {
   margin-bottom: var(--space-sm);
 }
 
-.weather-icon {
-  font-size: 4rem;
-  line-height: 1;
-}
+.weather-icon { font-size: 4rem; line-height: 1; }
 
 .weather-temp {
   font-size: var(--font-size-3xl);
@@ -388,9 +331,7 @@ body {
   color: var(--color-text-primary);
 }
 
-/* ===========================
-   Loading & Error States
-   =========================== */
+/* Status / Loading / Error */
 
 .status-area {
   position: relative;
@@ -404,9 +345,7 @@ body {
   max-width: 560px;
 }
 
-.spinner-container {
-  padding: 40px;
-}
+.spinner-container { padding: 40px; }
 
 .spinner {
   width: 40px;
@@ -417,9 +356,7 @@ body {
   animation: spin 0.8s linear infinite;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
+@keyframes spin { to { transform: rotate(360deg); } }
 
 .error-card {
   background: var(--color-glass);
@@ -433,31 +370,14 @@ body {
   animation: cardEnter var(--transition-slow) both;
 }
 
-.error-icon {
-  font-size: 2rem;
-  display: block;
-  margin-bottom: var(--space-sm);
-}
+.error-icon { font-size: 2rem; display: block; margin-bottom: var(--space-sm); }
+.error-text { font-size: var(--font-size-sm); color: var(--color-error); line-height: 1.5; }
 
-.error-text {
-  font-size: var(--font-size-sm);
-  color: var(--color-error);
-  line-height: 1.5;
-}
-
-/* ===========================
-   Animations
-   =========================== */
+/* Animations */
 
 @keyframes cardEnter {
-  from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+  from { opacity: 0; transform: translateY(20px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 @keyframes pulse {
@@ -465,9 +385,7 @@ body {
   50% { opacity: 0.3; }
 }
 
-/* ===========================
-   Precipitation Animation (Apple Weather–style)
-   =========================== */
+/* Rain Overlay */
 
 .rain-overlay {
   position: absolute;
@@ -493,46 +411,22 @@ body {
   animation: rainFall 0.6s linear infinite;
 }
 
-/* Intensity modifiers — control overall overlay opacity */
 .rain-low { opacity: 0.35; }
 .rain-medium { opacity: 0.55; }
 .rain-high { opacity: 0.75; }
 
 @keyframes rainFall {
-  0% {
-    transform: translateY(0);
-    opacity: 0;
-  }
-  15% {
-    opacity: 1;
-  }
-  85% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(calc(100% + 20px));
-    opacity: 0;
-  }
+  0% { transform: translateY(0); opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { transform: translateY(calc(100% + 20px)); opacity: 0; }
 }
 
-/* Vary raindrop height by even/odd for organic look */
-.rain-medium .raindrop:nth-child(even) {
-  height: 18px;
-  width: 1px;
-}
+.rain-medium .raindrop:nth-child(even) { height: 18px; width: 1px; }
+.rain-high .raindrop:nth-child(3n) { height: 20px; width: 2px; }
+.rain-high .raindrop:nth-child(3n+1) { height: 16px; }
 
-.rain-high .raindrop:nth-child(3n) {
-  height: 20px;
-  width: 2px;
-}
-
-.rain-high .raindrop:nth-child(3n+1) {
-  height: 16px;
-}
-
-/* ===========================
-   Forecast Sections
-   =========================== */
+/* Forecast */
 
 .forecast-section {
   width: 100%;
@@ -552,7 +446,7 @@ body {
   padding-left: var(--space-xs);
 }
 
-/* --- Hourly: horizontal scroll strip --- */
+/* Hourly */
 
 .hourly-scroll {
   display: flex;
@@ -563,9 +457,7 @@ body {
   -ms-overflow-style: none;
 }
 
-.hourly-scroll::-webkit-scrollbar {
-  display: none;
-}
+.hourly-scroll::-webkit-scrollbar { display: none; }
 
 .hourly-card {
   position: relative;
@@ -582,9 +474,7 @@ body {
   transition: border-color var(--transition-fast);
 }
 
-.hourly-card.has-rain {
-  border-color: rgba(174, 194, 255, 0.25);
-}
+.hourly-card.has-rain { border-color: rgba(174, 194, 255, 0.25); }
 
 .hourly-time {
   font-size: var(--font-size-xs);
@@ -618,7 +508,7 @@ body {
   z-index: 1;
 }
 
-/* --- Daily: vertical list --- */
+/* Daily */
 
 .daily-list {
   display: flex;
@@ -640,9 +530,7 @@ body {
   transition: border-color var(--transition-fast);
 }
 
-.daily-card.has-rain {
-  border-color: rgba(174, 194, 255, 0.25);
-}
+.daily-card.has-rain { border-color: rgba(174, 194, 255, 0.25); }
 
 .daily-day {
   width: 48px;
@@ -691,18 +579,11 @@ body {
   color: var(--color-text-muted);
 }
 
-/* ===========================
-   Responsive
-   =========================== */
+/* Responsive */
 
 @media (max-width: 520px) {
-  .app {
-    padding: 48px 16px 32px;
-  }
-
-  .app-title {
-    font-size: 1.6rem;
-  }
+  .app { padding: 48px 16px 32px; }
+  .app-title { font-size: 1.6rem; }
 
   .search-bar {
     flex-direction: column;
@@ -710,13 +591,8 @@ body {
     max-width: 360px;
   }
 
-  .search-input {
-    width: 100%;
-  }
-
-  .search-button {
-    width: 100%;
-  }
+  .search-input { width: 100%; }
+  .search-button { width: 100%; }
 
   .weather-card {
     min-width: unset;
@@ -725,15 +601,7 @@ body {
     padding: 32px 28px;
   }
 
-  .weather-temp {
-    font-size: 3.5rem;
-  }
-
-  .forecast-section {
-    max-width: 100%;
-  }
-
-  .daily-card {
-    padding: 12px 14px;
-  }
+  .weather-temp { font-size: 3.5rem; }
+  .forecast-section { max-width: 100%; }
+  .daily-card { padding: 12px 14px; }
 }

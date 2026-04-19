@@ -1,6 +1,3 @@
-// WeatherCard.jsx — Production weather data display
-// Glassmorphism card with structured layout and visual hierarchy
-
 function WeatherCard({ data }) {
   if (!data) return null
 

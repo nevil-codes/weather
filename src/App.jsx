@@ -1,6 +1,3 @@
-// App.jsx — Root component of the Weather Dashboard
-// Manages all application state and coordinates data flow
-
 import { useState, useEffect } from 'react'
 import SearchBar from './components/SearchBar'
 import WeatherCard from './components/WeatherCard'
@@ -13,12 +10,10 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
-  // Shared fetch handler to avoid duplicating try/catch logic
-  const performFetch = async (fetchFn) => {
+  const loadWeather = async (fetchFn) => {
     setLoading(true)
     setError(null)
     setWeather(null)
-
     try {
       const data = await fetchFn()
       setWeather(data)
@@ -29,13 +24,11 @@ function App() {
     }
   }
 
-  // Search by city name
   const handleSearch = (city) => {
     localStorage.setItem('lastCity', city)
-    performFetch(() => fetchWeather(city))
+    loadWeather(() => fetchWeather(city))
   }
 
-  // Use browser geolocation to fetch weather for current position
   const handleGeolocation = () => {
     if (!navigator.geolocation) {
       setError('Geolocation is not supported by your browser.')
@@ -47,36 +40,26 @@ function App() {
     setWeather(null)
 
     navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords
-        performFetch(() => fetchWeatherByCoords(latitude, longitude))
+      (pos) => {
+        const { latitude, longitude } = pos.coords
+        loadWeather(() => fetchWeatherByCoords(latitude, longitude))
       },
       (err) => {
         setLoading(false)
-        switch (err.code) {
-          case err.PERMISSION_DENIED:
-            setError('Location access denied. Please allow location access in your browser settings.')
-            break
-          case err.POSITION_UNAVAILABLE:
-            setError('Location unavailable. Please try again.')
-            break
-          case err.TIMEOUT:
-            setError('Location request timed out. Please try again.')
-            break
-          default:
-            setError('Unable to detect your location.')
+        const messages = {
+          [err.PERMISSION_DENIED]: 'Location access denied. Please allow location access in your browser settings.',
+          [err.POSITION_UNAVAILABLE]: 'Location unavailable. Please try again.',
+          [err.TIMEOUT]: 'Location request timed out. Please try again.',
         }
+        setError(messages[err.code] || 'Unable to detect your location.')
       },
       { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
     )
   }
 
-  // Auto-load last searched city on mount
   useEffect(() => {
-    const savedCity = localStorage.getItem('lastCity')
-    if (savedCity) {
-      handleSearch(savedCity)
-    }
+    const saved = localStorage.getItem('lastCity')
+    if (saved) handleSearch(saved)
   }, [])
 
   return (
@@ -89,12 +72,10 @@ function App() {
         className="geo-button"
         onClick={handleGeolocation}
         disabled={loading}
-        aria-label="Use current location"
       >
         📍 Use Current Location
       </button>
 
-      {/* Status area — loading, error, or weather data */}
       <div className="status-area">
         {loading && (
           <div className="spinner-container">

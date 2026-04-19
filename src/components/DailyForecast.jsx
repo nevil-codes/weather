@@ -1,41 +1,30 @@
-// DailyForecast.jsx — 7-day forecast list with Apple Weather layout
-// Shows precipitation probability and RainEffect overlay on rainy days
-
 import RainEffect from './RainEffect'
-import { shouldShowPrecipitation, getPrecipitationIntensity } from '../utils/precipitation'
+import { shouldShowRain, getRainIntensity } from '../utils/precipitation'
 
-const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
-function formatDay(isoString, index) {
-  if (index === 0) return 'Today'
-  const date = new Date(isoString + 'T00:00:00')
-  return DAY_NAMES[date.getDay()]
+function dayLabel(iso, i) {
+  if (i === 0) return 'Today'
+  return DAYS[new Date(iso + 'T00:00:00').getDay()]
 }
 
 function DailyForecast({ days }) {
-  if (!days || days.length === 0) return null
+  if (!days?.length) return null
 
   return (
     <section className="forecast-section">
       <h2 className="forecast-title">7-Day Forecast</h2>
       <div className="daily-list">
-        {days.map((day, index) => {
-          const showRain = shouldShowPrecipitation(day)
-          const intensity = getPrecipitationIntensity(day.precipProbability)
+        {days.map((day, i) => {
+          const rainy = shouldShowRain(day)
+          const intensity = getRainIntensity(day.precipProbability)
           return (
-            <div
-              key={day.date}
-              className={`daily-card${showRain ? ' has-rain' : ''}`}
-            >
-              {showRain && intensity && <RainEffect intensity={intensity} />}
-              <span className="daily-day">{formatDay(day.date, index)}</span>
-              <span className="daily-icon" role="img" aria-label={day.description}>
-                {day.icon}
-              </span>
+            <div key={day.date} className={`daily-card${rainy ? ' has-rain' : ''}`}>
+              {rainy && intensity && <RainEffect intensity={intensity} />}
+              <span className="daily-day">{dayLabel(day.date, i)}</span>
+              <span className="daily-icon" role="img" aria-label={day.description}>{day.icon}</span>
               <span className="daily-precip-badge">
-                {day.precipProbability >= 10
-                  ? `${day.precipProbability}%`
-                  : ''}
+                {day.precipProbability >= 10 ? `${day.precipProbability}%` : ''}
               </span>
               <div className="daily-temp-range">
                 <span className="daily-temp-high">{day.high}°</span>
