@@ -1,9 +1,8 @@
 // HourlyForecast.jsx — Horizontal scrolling hourly forecast strip
-// Shows next 24 hours with RainEffect overlay on precipitation cards
+// Shows next 24 hours with Apple Weather–style RainEffect on precipitation cards
 
 import RainEffect from './RainEffect'
-
-const PRECIP_THRESHOLD = 10 // Show rain effect above this %
+import { shouldShowPrecipitation, getPrecipitationIntensity } from '../utils/precipitation'
 
 function formatHour(isoString) {
   const date = new Date(isoString)
@@ -21,13 +20,14 @@ function HourlyForecast({ hours }) {
       <h2 className="forecast-title">Hourly Forecast</h2>
       <div className="hourly-scroll">
         {hours.map((hour, index) => {
-          const showRain = hour.precipProbability >= PRECIP_THRESHOLD || hour.isRain
+          const showRain = shouldShowPrecipitation(hour)
+          const intensity = getPrecipitationIntensity(hour.precipProbability)
           return (
             <div
               key={hour.time}
               className={`hourly-card${showRain ? ' has-rain' : ''}`}
             >
-              {showRain && <RainEffect probability={hour.precipProbability} />}
+              {showRain && intensity && <RainEffect intensity={intensity} />}
               <span className="hourly-time">
                 {index === 0 ? 'Now' : formatHour(hour.time)}
               </span>
@@ -35,7 +35,7 @@ function HourlyForecast({ hours }) {
                 {hour.icon}
               </span>
               <span className="hourly-temp">{hour.temp}°</span>
-              {hour.precipProbability >= PRECIP_THRESHOLD && (
+              {hour.precipProbability >= 10 && (
                 <span className="hourly-precip">{hour.precipProbability}%</span>
               )}
             </div>

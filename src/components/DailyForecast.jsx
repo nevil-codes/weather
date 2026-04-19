@@ -2,8 +2,8 @@
 // Shows precipitation probability and RainEffect overlay on rainy days
 
 import RainEffect from './RainEffect'
+import { shouldShowPrecipitation, getPrecipitationIntensity } from '../utils/precipitation'
 
-const PRECIP_THRESHOLD = 10 // Show rain effect above this %
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 function formatDay(isoString, index) {
@@ -20,19 +20,20 @@ function DailyForecast({ days }) {
       <h2 className="forecast-title">7-Day Forecast</h2>
       <div className="daily-list">
         {days.map((day, index) => {
-          const showRain = day.precipProbability >= PRECIP_THRESHOLD || day.isRain
+          const showRain = shouldShowPrecipitation(day)
+          const intensity = getPrecipitationIntensity(day.precipProbability)
           return (
             <div
               key={day.date}
               className={`daily-card${showRain ? ' has-rain' : ''}`}
             >
-              {showRain && <RainEffect probability={day.precipProbability} />}
+              {showRain && intensity && <RainEffect intensity={intensity} />}
               <span className="daily-day">{formatDay(day.date, index)}</span>
               <span className="daily-icon" role="img" aria-label={day.description}>
                 {day.icon}
               </span>
               <span className="daily-precip-badge">
-                {day.precipProbability >= PRECIP_THRESHOLD
+                {day.precipProbability >= 10
                   ? `${day.precipProbability}%`
                   : ''}
               </span>
