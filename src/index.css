@@ -2,6 +2,9 @@
    Global Styles — Weather App
    =========================== */
 
+/* Import a clean Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
 /* Reset default margins and set a base font */
 * {
   margin: 0;
@@ -10,8 +13,8 @@
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f0f4f8;
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: #333;
   min-height: 100vh;
 }
@@ -29,9 +32,11 @@ body {
 }
 
 .app-title {
-  font-size: 2rem;
-  margin-bottom: 24px;
-  color: #1a1a2e;
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 28px;
+  color: #ffffff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 /* ===========================
@@ -45,32 +50,47 @@ body {
 }
 
 .search-input {
-  padding: 12px 16px;
+  padding: 14px 18px;
   font-size: 1rem;
-  border: 2px solid #ddd;
-  border-radius: 8px;
+  font-family: inherit;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
   outline: none;
-  width: 260px;
-  transition: border-color 0.2s;
+  width: 280px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(4px);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.search-input::placeholder {
+  color: #999;
 }
 
 .search-input:focus {
-  border-color: #4a90d9;
+  border-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
 }
 
 .search-button {
-  padding: 12px 24px;
+  padding: 14px 28px;
   font-size: 1rem;
-  background-color: #4a90d9;
+  font-family: inherit;
+  font-weight: 600;
+  background-color: rgba(255, 255, 255, 0.2);
   color: white;
-  border: none;
-  border-radius: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 12px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  backdrop-filter: blur(4px);
+  transition: background-color 0.2s, transform 0.1s;
 }
 
 .search-button:hover {
-  background-color: #357abd;
+  background-color: rgba(255, 255, 255, 0.35);
+}
+
+.search-button:active {
+  transform: scale(0.97);
 }
 
 /* ===========================
@@ -78,16 +98,18 @@ body {
    =========================== */
 
 .weather-card {
-  background: white;
-  border-radius: 16px;
-  padding: 32px 48px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  padding: 36px 52px;
   text-align: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  min-width: 280px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  min-width: 300px;
+  animation: fadeIn 0.4s ease-out;
 }
 
 .weather-city {
   font-size: 1.6rem;
+  font-weight: 600;
   color: #1a1a2e;
   margin-bottom: 4px;
 }
@@ -95,10 +117,11 @@ body {
 .weather-icon {
   width: 100px;
   height: 100px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
 .weather-temp {
-  font-size: 3rem;
+  font-size: 3.5rem;
   font-weight: 700;
   color: #1a1a2e;
   margin: -8px 0 4px;
@@ -116,21 +139,71 @@ body {
 
 .loading-text {
   font-size: 1.2rem;
-  color: #4a90d9;
+  color: #ffffff;
   animation: pulse 1.5s ease-in-out infinite;
 }
 
-/* Subtle pulsing animation for the loading text */
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
 }
 
 .error-text {
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: #e74c3c;
-  background: #ffeaea;
-  padding: 10px 20px;
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 12px 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }
 
+/* Fade-in animation for the weather card */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===========================
+   Responsive — mobile support
+   =========================== */
+
+@media (max-width: 480px) {
+  .app {
+    padding: 40px 16px;
+  }
+
+  .app-title {
+    font-size: 1.7rem;
+  }
+
+  .search-bar {
+    flex-direction: column;
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .search-input {
+    width: 100%;
+  }
+
+  .search-button {
+    width: 100%;
+  }
+
+  .weather-card {
+    min-width: unset;
+    width: 100%;
+    max-width: 320px;
+    padding: 28px 24px;
+  }
+
+  .weather-temp {
+    font-size: 2.8rem;
+  }
+}
