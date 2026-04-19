@@ -23,15 +23,33 @@ export async function fetchWeather(city) {
   //   units  = metric (for Celsius)
   const url = `${BASE_URL}?q=${encodeURIComponent(city)}&appid=${API_KEY}&units=metric`
 
-  // Make the HTTP request using fetch()
-  const response = await fetch(url)
+  try {
+    // Make the HTTP request using fetch()
+    const response = await fetch(url)
 
-  // If the response is not OK (e.g., 404 = city not found), throw an error
-  if (!response.ok) {
-    throw new Error('City not found')
+    // Handle different error status codes with helpful messages
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error('City not found. Please check the spelling and try again.')
+      } else if (response.status === 401) {
+        throw new Error('Invalid API key. Please check your OpenWeatherMap API key.')
+      } else {
+        throw new Error(`Something went wrong (Error ${response.status}). Please try again.`)
+      }
+    }
+
+    // Parse and return the JSON data
+    const data = await response.json()
+    return data
+  } catch (err) {
+    // If the error is already one we threw above, re-throw it
+    if (err.message.includes('City not found') ||
+        err.message.includes('Invalid API key') ||
+        err.message.includes('Something went wrong')) {
+      throw err
+    }
+
+    // Otherwise it's a network error (no internet, DNS failure, etc.)
+    throw new Error('Network error. Please check your internet connection.')
   }
-
-  // Parse and return the JSON data
-  const data = await response.json()
-  return data
 }
