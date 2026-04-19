@@ -1,5 +1,5 @@
 // api/weather.js — Weather data layer using Open-Meteo API
-// Supports both city name search and coordinate-based lookup (for geolocation)
+// Supports city search, coordinate lookup, hourly/daily forecasts, and autocomplete
 
 const GEOCODE_URL = 'https://geocoding-api.open-meteo.com/v1/search'
 const WEATHER_URL = 'https://api.open-meteo.com/v1/forecast'
@@ -33,13 +33,29 @@ const WEATHER_CODES = {
   99: { description: 'Thunderstorm with heavy hail', icon: '⛈️' },
 }
 
+/** WMO codes that represent precipitation conditions */
+const RAIN_CODES = new Set([51, 53, 55, 61, 63, 65, 80, 81, 82, 95, 96, 99])
+
+function getWeatherInfo(code) {
+  return WEATHER_CODES[code] || { description: 'Unknown', icon: '🌡️' }
+}
+
 /**
- * Internal helper — fetches weather for given coordinates.
- * Shared by both fetchWeather and fetchWeatherByCoords.
+ * Internal helper — fetches full weather data for given coordinates.
+ * Returns current weather + hourly (24h) + daily (7-day) forecasts.
  */
 async function getWeatherForCoords(latitude, longitude) {
-  const url = `${WEATHER_URL}?latitude=${latitude}&longitude=${longitude}&current_weather=true`
-  const response = await fetch(url)
+  const params = new URLSearchParams({
+    latitude,
+    longitude,
+    current_weather: 'true',
+    hourly: 'temperature_2m,weathercode,precipitation_probability',
+    daily: 'temperature_2m_max,temperature_2m_min,weathercode,precipitation_probability_max',
+    timezone: 'auto',
+    forecast_days: '7',
+  })
+
+  const response = await fetch(`${WEATHER_URL}?${params}`)
 
   if (!response.ok) {
     throw new Error('Failed to fetch weather data. Please try again.')
@@ -47,17 +63,50 @@ async function getWeatherForCoords(latitude, longitude) {
 
   const data = await response.json()
   const current = data.current_weather
+  const currentInfo = getWeatherInfo(current.weathercode)
 
-  const weatherInfo = WEATHER_CODES[current.weathercode] || {
-    description: 'Unknown',
-    icon: '🌡️',
+  // Build next 24 hours of hourly data starting from current hour
+  const now = new Date()
+  const currentHourIndex = data.hourly.time.findIndex((t) => {
+    const hourDate = new Date(t)
+    return hourDate >= now
+  })
+
+  const hourly = []
+  for (let i = 0; i < 24 && currentHourIndex + i < data.hourly.time.length; i++) {
+    const idx = currentHourIndex + i
+    const info = getWeatherInfo(data.hourly.weathercode[idx])
+    hourly.push({
+      time: data.hourly.time[idx],
+      temp: Math.round(data.hourly.temperature_2m[idx]),
+      icon: info.icon,
+      description: info.description,
+      precipProbability: data.hourly.precipitation_probability[idx] || 0,
+      isRain: RAIN_CODES.has(data.hourly.weathercode[idx]),
+    })
   }
+
+  // Build 7-day daily data
+  const daily = data.daily.time.map((time, i) => {
+    const info = getWeatherInfo(data.daily.weathercode[i])
+    return {
+      date: time,
+      high: Math.round(data.daily.temperature_2m_max[i]),
+      low: Math.round(data.daily.temperature_2m_min[i]),
+      icon: info.icon,
+      description: info.description,
+      precipProbability: data.daily.precipitation_probability_max[i] || 0,
+      isRain: RAIN_CODES.has(data.daily.weathercode[i]),
+    }
+  })
 
   return {
     temp: Math.round(current.temperature),
-    description: weatherInfo.description,
-    icon: weatherInfo.icon,
+    description: currentInfo.description,
+    icon: currentInfo.icon,
     windspeed: current.windspeed,
+    hourly,
+    daily,
   }
 }
 
@@ -99,10 +148,8 @@ export async function fetchWeather(city) {
  */
 export async function fetchWeatherByCoords(latitude, longitude) {
   try {
-    // Fetch weather data
     const weather = await getWeatherForCoords(latitude, longitude)
 
-    // Reverse geocode to get a city name
     const geoUrl = `${REVERSE_GEO_URL}?lat=${latitude}&lon=${longitude}&format=json`
     const geoResponse = await fetch(geoUrl, {
       headers: { 'Accept-Language': 'en' },
@@ -127,7 +174,6 @@ export async function fetchWeatherByCoords(latitude, longitude) {
 
 /**
  * Returns city suggestions for autocomplete.
- * Uses the Open-Meteo geocoding API with count=5.
  */
 export async function searchCities(query) {
   if (!query || query.trim().length < 2) return []
@@ -141,7 +187,6 @@ export async function searchCities(query) {
     const data = await response.json()
     if (!data.results) return []
 
-    // Return unique city strings
     const seen = new Set()
     return data.results
       .map((r) => `${r.name}, ${r.country}`)

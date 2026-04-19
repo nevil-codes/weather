@@ -4,6 +4,8 @@
 import { useState, useEffect } from 'react'
 import SearchBar from './components/SearchBar'
 import WeatherCard from './components/WeatherCard'
+import HourlyForecast from './components/HourlyForecast'
+import DailyForecast from './components/DailyForecast'
 import { fetchWeather, fetchWeatherByCoords } from './api/weather'
 
 function App() {
@@ -92,7 +94,7 @@ function App() {
         📍 Use Current Location
       </button>
 
-      {/* Status area — loading, error, or weather card */}
+      {/* Status area — loading, error, or weather data */}
       <div className="status-area">
         {loading && (
           <div className="spinner-container">
@@ -107,7 +109,13 @@ function App() {
           </div>
         )}
 
-        {weather && !loading && <WeatherCard data={weather} />}
+        {weather && !loading && (
+          <>
+            <WeatherCard data={weather} />
+            <HourlyForecast hours={weather.hourly} />
+            <DailyForecast days={weather.daily} />
+          </>
+        )}
       </div>
     </div>
   )
