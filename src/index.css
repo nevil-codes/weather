@@ -109,3 +109,28 @@ body {
   color: #666;
   text-transform: capitalize;
 }
+
+/* ===========================
+   Loading & Error States
+   =========================== */
+
+.loading-text {
+  font-size: 1.2rem;
+  color: #4a90d9;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Subtle pulsing animation for the loading text */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.error-text {
+  font-size: 1.1rem;
+  color: #e74c3c;
+  background: #ffeaea;
+  padding: 10px 20px;
+  border-radius: 8px;
+}
+
