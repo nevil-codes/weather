@@ -72,3 +72,40 @@ body {
 .search-button:hover {
   background-color: #357abd;
 }
+
+/* ===========================
+   WeatherCard — data display
+   =========================== */
+
+.weather-card {
+  background: white;
+  border-radius: 16px;
+  padding: 32px 48px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  min-width: 280px;
+}
+
+.weather-city {
+  font-size: 1.6rem;
+  color: #1a1a2e;
+  margin-bottom: 4px;
+}
+
+.weather-icon {
+  width: 100px;
+  height: 100px;
+}
+
+.weather-temp {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: -8px 0 4px;
+}
+
+.weather-description {
+  font-size: 1.1rem;
+  color: #666;
+  text-transform: capitalize;
+}
