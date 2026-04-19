@@ -269,6 +269,41 @@ body {
   color: var(--color-text-primary);
 }
 /* ===========================
+   Geolocation Button
+   =========================== */
+
+.geo-button {
+  background: none;
+  border: 1px solid var(--color-glass-border);
+  color: var(--color-text-secondary);
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm);
+  padding: 10px 20px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  margin-bottom: var(--space-xl);
+  transition: all var(--transition-fast);
+  position: relative;
+  z-index: 1;
+}
+
+.geo-button:hover {
+  background: rgba(108, 99, 255, 0.15);
+  border-color: var(--color-accent);
+  color: var(--color-text-primary);
+}
+
+.geo-button:active {
+  transform: scale(0.97);
+}
+
+.geo-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ===========================
    Weather Card — Glassmorphism
    =========================== */
 
