@@ -115,22 +115,28 @@ body {
 }
 
 .weather-icon {
-  width: 100px;
-  height: 100px;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  font-size: 4rem;
+  line-height: 1;
+  margin: 8px 0;
 }
 
 .weather-temp {
   font-size: 3.5rem;
   font-weight: 700;
   color: #1a1a2e;
-  margin: -8px 0 4px;
+  margin: 4px 0;
 }
 
 .weather-description {
   font-size: 1.1rem;
   color: #666;
   text-transform: capitalize;
+}
+
+.weather-wind {
+  font-size: 0.95rem;
+  color: #888;
+  margin-top: 8px;
 }
 
 /* ===========================
