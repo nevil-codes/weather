@@ -1,43 +1,47 @@
-// SearchBar.jsx — Handles city name input and search trigger
-// Uses useState for input tracking and calls onSearch prop when user submits
+// SearchBar.jsx — Production search input with enhanced UX
+// Disabled button when empty, visual feedback, Enter key support
 
 import { useState } from 'react'
 
 function SearchBar({ onSearch }) {
-  // Initialize input with last searched city from localStorage (if any)
   const [city, setCity] = useState(
     () => localStorage.getItem('lastCity') || ''
   )
 
-  // Called when the user clicks "Search" or presses Enter
   const handleSearch = () => {
-    // Only search if the input is not empty
-    if (city.trim() !== '') {
-      onSearch(city.trim())  // Pass the city name up to the parent (App)
+    const trimmed = city.trim()
+    if (trimmed) {
+      onSearch(trimmed)
     }
   }
 
-  // Allow searching by pressing the Enter key
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
       handleSearch()
     }
   }
 
+  // Check if input has valid content for enabling the button
+  const isDisabled = city.trim().length === 0
+
   return (
     <div className="search-bar">
-      {/* Text input — controlled by React state */}
       <input
         type="text"
         className="search-input"
-        placeholder="Enter city name..."
+        placeholder="Search for a city..."
         value={city}
         onChange={(e) => setCity(e.target.value)}
         onKeyDown={handleKeyDown}
+        autoComplete="off"
+        spellCheck="false"
       />
-
-      {/* Button triggers the search */}
-      <button className="search-button" onClick={handleSearch}>
+      <button
+        className="search-button"
+        onClick={handleSearch}
+        disabled={isDisabled}
+        aria-label="Search weather"
+      >
         Search
       </button>
     </div>
