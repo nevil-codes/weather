@@ -1,14 +1,21 @@
 // SearchBar.jsx — Handles city name input and search trigger
-// Contains a text input and a search button side by side
+// Uses useState to track the current input value
+
+import { useState } from 'react'
 
 function SearchBar() {
+  // State to store the text the user types in the input
+  const [city, setCity] = useState('')
+
   return (
     <div className="search-bar">
-      {/* Text input where the user types a city name */}
+      {/* Text input — value is controlled by React state */}
       <input
         type="text"
         className="search-input"
         placeholder="Enter city name..."
+        value={city}
+        onChange={(e) => setCity(e.target.value)}
       />
 
       {/* Button to trigger the search */}
