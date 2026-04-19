@@ -76,11 +76,20 @@
 body {
   font-family: var(--font-family);
   background: linear-gradient(135deg, var(--color-bg-start), var(--color-bg-mid), var(--color-bg-end));
+  background-size: 400% 400%;
   background-attachment: fixed;
+  animation: gradientShift 15s ease infinite;
   color: var(--color-text-primary);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 /* ===========================
@@ -96,12 +105,50 @@ body {
   position: relative;
 }
 
+/* Ambient floating orbs for depth */
+.app::before,
+.app::after {
+  content: '';
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.3;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app::before {
+  width: 400px;
+  height: 400px;
+  background: #6c63ff;
+  top: -100px;
+  right: -100px;
+  animation: floatOrb 20s ease-in-out infinite;
+}
+
+.app::after {
+  width: 350px;
+  height: 350px;
+  background: #00d2ff;
+  bottom: -80px;
+  left: -80px;
+  animation: floatOrb 25s ease-in-out infinite reverse;
+}
+
+@keyframes floatOrb {
+  0%, 100% { transform: translate(0, 0); }
+  33% { transform: translate(30px, -40px); }
+  66% { transform: translate(-20px, 20px); }
+}
+
 .app-title {
   font-size: var(--font-size-2xl);
   font-weight: 700;
   margin-bottom: var(--space-xl);
   color: var(--color-text-primary);
   letter-spacing: -0.5px;
+  position: relative;
+  z-index: 1;
 }
 
 /* ===========================
