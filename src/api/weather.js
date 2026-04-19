@@ -6,7 +6,7 @@
 // 3. Copy your API key from the dashboard
 // 4. Replace the placeholder below with your key
 
-const API_KEY = 'YOUR_API_KEY_HERE'  // <-- Replace with your OpenWeatherMap API key
+const API_KEY = import.meta.env.VITE_API_KEY  // Loaded from .env file
 const BASE_URL = 'https://api.openweathermap.org/data/2.5/weather'
 
 /**
@@ -44,8 +44,8 @@ export async function fetchWeather(city) {
   } catch (err) {
     // If the error is already one we threw above, re-throw it
     if (err.message.includes('City not found') ||
-        err.message.includes('Invalid API key') ||
-        err.message.includes('Something went wrong')) {
+      err.message.includes('Invalid API key') ||
+      err.message.includes('Something went wrong')) {
       throw err
     }
 
