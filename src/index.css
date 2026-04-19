@@ -160,6 +160,7 @@ body {
   gap: var(--space-sm);
   margin-bottom: var(--space-xl);
   position: relative;
+  z-index: 1;
 }
 
 .search-input {
@@ -228,6 +229,8 @@ body {
   box-shadow: var(--shadow-glass);
   min-width: 340px;
   animation: cardEnter var(--transition-slow) both;
+  position: relative;
+  z-index: 1;
 }
 
 .weather-city {
@@ -274,6 +277,8 @@ body {
   font-size: var(--font-size-lg);
   color: var(--color-text-secondary);
   animation: pulse 1.5s ease-in-out infinite;
+  position: relative;
+  z-index: 1;
 }
 
 .error-text {
@@ -287,6 +292,8 @@ body {
   border-radius: var(--radius-md);
   max-width: 380px;
   text-align: center;
+  position: relative;
+  z-index: 1;
 }
 
 /* ===========================
