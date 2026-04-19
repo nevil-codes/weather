@@ -43,10 +43,17 @@ function App() {
       {/* Pass handleSearch as callback to SearchBar */}
       <SearchBar onSearch={handleSearch} />
 
-      {/* Temporarily show raw data to verify API works */}
+      {/* Temporary: show raw JSON to verify API response structure */}
       {loading && <p>Loading...</p>}
-      {error && <p>{error}</p>}
-      {weather && <pre>{JSON.stringify(weather, null, 2)}</pre>}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {weather && (
+        <div style={{ textAlign: 'left', maxWidth: '500px', fontSize: '0.8rem' }}>
+          <h3>📦 Raw API Response (debug):</h3>
+          <pre style={{ background: '#eee', padding: '12px', borderRadius: '8px', overflow: 'auto' }}>
+            {JSON.stringify(weather, null, 2)}
+          </pre>
+        </div>
+      )}
     </div>
   )
 }
