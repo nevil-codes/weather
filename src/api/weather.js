@@ -1,15 +1,11 @@
-// api/weather.js — Fetches weather data from Open-Meteo API (free, no API key needed)
-//
-// Open-Meteo uses coordinates, so we first geocode the city name,
-// then fetch the weather for those coordinates.
+// api/weather.js — Weather data layer using Open-Meteo API
+// Supports both city name search and coordinate-based lookup (for geolocation)
 
 const GEOCODE_URL = 'https://geocoding-api.open-meteo.com/v1/search'
 const WEATHER_URL = 'https://api.open-meteo.com/v1/forecast'
+const REVERSE_GEO_URL = 'https://nominatim.openstreetmap.org/reverse'
 
-/**
- * Maps WMO weather codes to human-readable descriptions and emoji icons.
- * Full list: https://open-meteo.com/en/docs#weathervariables
- */
+/** WMO weather code → description + emoji mapping */
 const WEATHER_CODES = {
   0: { description: 'Clear sky', icon: '☀️' },
   1: { description: 'Mainly clear', icon: '🌤️' },
@@ -38,19 +34,41 @@ const WEATHER_CODES = {
 }
 
 /**
- * Fetches current weather data for a given city.
- *
- * Step 1: Geocode the city name to get latitude/longitude
- * Step 2: Fetch weather data for those coordinates
- *
- * @param {string} city — The city name to search for
- * @returns {object} — Formatted weather data
- * @throws {Error} — If the city is not found or the request fails
+ * Internal helper — fetches weather for given coordinates.
+ * Shared by both fetchWeather and fetchWeatherByCoords.
+ */
+async function getWeatherForCoords(latitude, longitude) {
+  const url = `${WEATHER_URL}?latitude=${latitude}&longitude=${longitude}&current_weather=true`
+  const response = await fetch(url)
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch weather data. Please try again.')
+  }
+
+  const data = await response.json()
+  const current = data.current_weather
+
+  const weatherInfo = WEATHER_CODES[current.weathercode] || {
+    description: 'Unknown',
+    icon: '🌡️',
+  }
+
+  return {
+    temp: Math.round(current.temperature),
+    description: weatherInfo.description,
+    icon: weatherInfo.icon,
+    windspeed: current.windspeed,
+  }
+}
+
+/**
+ * Fetches weather by city name.
+ * Step 1: Geocode city → coords
+ * Step 2: Fetch weather for coords
  */
 export async function fetchWeather(city) {
   try {
-    // --- Step 1: Geocode the city name ---
-    const geoUrl = `${GEOCODE_URL}?name=${encodeURIComponent(city)}&count=1`
+    const geoUrl = `${GEOCODE_URL}?name=${encodeURIComponent(city)}&count=5&language=en`
     const geoResponse = await fetch(geoUrl)
 
     if (!geoResponse.ok) {
@@ -59,47 +77,80 @@ export async function fetchWeather(city) {
 
     const geoData = await geoResponse.json()
 
-    // If no results found, the city doesn't exist
     if (!geoData.results || geoData.results.length === 0) {
-      throw new Error('City not found. Please check the spelling and try again.')
+      throw new Error('City not found. Please check the spelling.')
     }
 
-    // Get the first (best) match
     const { latitude, longitude, name, country } = geoData.results[0]
+    const weather = await getWeatherForCoords(latitude, longitude)
 
-    // --- Step 2: Fetch weather for these coordinates ---
-    const weatherUrl = `${WEATHER_URL}?latitude=${latitude}&longitude=${longitude}&current_weather=true`
-    const weatherResponse = await fetch(weatherUrl)
-
-    if (!weatherResponse.ok) {
-      throw new Error('Failed to fetch weather data. Please try again.')
-    }
-
-    const weatherData = await weatherResponse.json()
-    const current = weatherData.current_weather
-
-    // Look up the weather code to get description and icon
-    const weatherInfo = WEATHER_CODES[current.weathercode] || {
-      description: 'Unknown',
-      icon: '🌡️',
-    }
-
-    // Return a clean, formatted object (same shape our WeatherCard expects)
-    return {
-      name: `${name}, ${country}`,
-      temp: Math.round(current.temperature),
-      description: weatherInfo.description,
-      icon: weatherInfo.icon,
-      windspeed: current.windspeed,
-    }
+    return { ...weather, name: `${name}, ${country}` }
   } catch (err) {
-    // If it's an error we threw above, re-throw it
-    if (err.message.includes('City not found') ||
-        err.message.includes('Failed to')) {
+    if (err.message.includes('City not found') || err.message.includes('Failed to')) {
       throw err
     }
+    throw new Error('Network error. Check your internet connection.')
+  }
+}
 
-    // Otherwise it's a network error
-    throw new Error('Network error. Please check your internet connection.')
+/**
+ * Fetches weather by geographic coordinates (for geolocation feature).
+ * Uses reverse geocoding to get the city name.
+ */
+export async function fetchWeatherByCoords(latitude, longitude) {
+  try {
+    // Fetch weather data
+    const weather = await getWeatherForCoords(latitude, longitude)
+
+    // Reverse geocode to get a city name
+    const geoUrl = `${REVERSE_GEO_URL}?lat=${latitude}&lon=${longitude}&format=json`
+    const geoResponse = await fetch(geoUrl, {
+      headers: { 'Accept-Language': 'en' },
+    })
+
+    let cityName = 'Your Location'
+    if (geoResponse.ok) {
+      const geoData = await geoResponse.json()
+      const city = geoData.address?.city || geoData.address?.town || geoData.address?.village || ''
+      const country = geoData.address?.country || ''
+      if (city) {
+        cityName = country ? `${city}, ${country}` : city
+      }
+    }
+
+    return { ...weather, name: cityName }
+  } catch (err) {
+    if (err.message.includes('Failed to')) throw err
+    throw new Error('Network error. Check your internet connection.')
+  }
+}
+
+/**
+ * Returns city suggestions for autocomplete.
+ * Uses the Open-Meteo geocoding API with count=5.
+ */
+export async function searchCities(query) {
+  if (!query || query.trim().length < 2) return []
+
+  try {
+    const url = `${GEOCODE_URL}?name=${encodeURIComponent(query.trim())}&count=5&language=en`
+    const response = await fetch(url)
+
+    if (!response.ok) return []
+
+    const data = await response.json()
+    if (!data.results) return []
+
+    // Return unique city strings
+    const seen = new Set()
+    return data.results
+      .map((r) => `${r.name}, ${r.country}`)
+      .filter((name) => {
+        if (seen.has(name)) return false
+        seen.add(name)
+        return true
+      })
+  } catch {
+    return []
   }
 }
