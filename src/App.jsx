@@ -5,7 +5,6 @@ import { useState, useEffect } from 'react'
 import SearchBar from './components/SearchBar'
 import WeatherCard from './components/WeatherCard'
 import { fetchWeather } from './api/weather'
-import './index.css'
 
 function App() {
   // State for the weather data returned from the API
