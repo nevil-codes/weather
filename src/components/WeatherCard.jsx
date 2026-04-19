@@ -1,32 +1,34 @@
-// WeatherCard.jsx — Displays weather data for a city
-// Receives formatted weather data as a prop and renders it in a styled card
+// WeatherCard.jsx — Production weather data display
+// Glassmorphism card with structured layout and visual hierarchy
 
 function WeatherCard({ data }) {
-  // If no data is passed, don't render anything
-  if (!data) {
-    return null
-  }
+  if (!data) return null
 
-  // Data comes pre-formatted from our API utility:
-  // { name, temp, description, icon (emoji), windspeed }
   const { name, temp, description, icon, windspeed } = data
 
   return (
     <div className="weather-card">
-      {/* City name and country */}
-      <h2 className="weather-city">{name}</h2>
+      <p className="weather-location">{name}</p>
 
-      {/* Weather emoji icon */}
-      <span className="weather-icon">{icon}</span>
+      <div className="weather-main">
+        <span className="weather-icon" role="img" aria-label={description}>
+          {icon}
+        </span>
+        <span className="weather-temp">{temp}°</span>
+      </div>
 
-      {/* Temperature in Celsius */}
-      <p className="weather-temp">{temp}°C</p>
-
-      {/* Weather condition description */}
       <p className="weather-description">{description}</p>
 
-      {/* Wind speed */}
-      <p className="weather-wind">💨 {windspeed} km/h</p>
+      <div className="weather-details">
+        <div className="weather-detail">
+          <span className="detail-label">Wind</span>
+          <span className="detail-value">{windspeed} km/h</span>
+        </div>
+        <div className="weather-detail">
+          <span className="detail-label">Feels like</span>
+          <span className="detail-value">{temp}°C</span>
+        </div>
+      </div>
     </div>
   )
 }
