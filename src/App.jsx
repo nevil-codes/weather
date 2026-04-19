@@ -1,66 +1,69 @@
-// App.jsx — Root component of the Weather App
-// Manages weather data state, handles API calls, and persists last search
+// App.jsx — Root component of the Weather Dashboard
+// Manages all application state and coordinates data flow
 
 import { useState, useEffect } from 'react'
 import SearchBar from './components/SearchBar'
 import WeatherCard from './components/WeatherCard'
-import { fetchWeather } from './api/weather'
+import { fetchWeather, fetchWeatherByCoords } from './api/weather'
 
 function App() {
-  // State for the weather data returned from the API
   const [weather, setWeather] = useState(null)
-
-  // State for loading indicator (true while fetching)
   const [loading, setLoading] = useState(false)
-
-  // State for error messages (e.g., city not found)
   const [error, setError] = useState(null)
 
-  /**
-   * Called when the user searches for a city.
-   * Fetches weather data and updates state accordingly.
-   */
-  const handleSearch = async (city) => {
-    setLoading(true)   // Show loading state
-    setError(null)     // Clear any previous errors
-    setWeather(null)   // Clear previous weather data
+  // Shared fetch handler to avoid duplicating try/catch logic
+  const performFetch = async (fetchFn) => {
+    setLoading(true)
+    setError(null)
+    setWeather(null)
 
     try {
-      const data = await fetchWeather(city)
-      setWeather(data)  // Store the API response
-
-      // Save the successfully searched city to localStorage
-      localStorage.setItem('lastCity', city)
+      const data = await fetchFn()
+      setWeather(data)
     } catch (err) {
-      setError(err.message)  // Store the error message
+      setError(err.message)
     } finally {
-      setLoading(false)  // Hide loading state regardless of success/failure
+      setLoading(false)
     }
   }
 
-  // On first load, check if there's a saved city and auto-search it
+  // Search by city name
+  const handleSearch = (city) => {
+    localStorage.setItem('lastCity', city)
+    performFetch(() => fetchWeather(city))
+  }
+
+  // Auto-load last searched city on mount
   useEffect(() => {
     const savedCity = localStorage.getItem('lastCity')
     if (savedCity) {
       handleSearch(savedCity)
     }
-  }, [])  // Empty dependency array = runs only once on mount
+  }, [])
 
   return (
     <div className="app">
-      <h1 className="app-title">🌤️ Weather App</h1>
+      <h1 className="app-title">Weather Dashboard</h1>
 
-      {/* Pass handleSearch as callback to SearchBar */}
       <SearchBar onSearch={handleSearch} />
 
-      {/* Loading indicator */}
-      {loading && <p className="loading-text">Loading...</p>}
+      {/* Status area — loading, error, or weather card */}
+      <div className="status-area">
+        {loading && (
+          <div className="spinner-container">
+            <div className="spinner" />
+          </div>
+        )}
 
-      {/* Error message */}
-      {error && <p className="error-text">{error}</p>}
+        {error && !loading && (
+          <div className="error-card">
+            <span className="error-icon">⚠️</span>
+            <p className="error-text">{error}</p>
+          </div>
+        )}
 
-      {/* Weather data card — only renders when data exists */}
-      <WeatherCard data={weather} />
+        {weather && !loading && <WeatherCard data={weather} />}
+      </div>
     </div>
   )
 }
